@@ -76,6 +76,7 @@
     <button id="increment-btn" disabled>¡Me gusta!</button>
   </div>
 
+  <!-- Foto de perfil de Discord -->
   <div class="discord-profile">
     <div class="avatar__75742 clickable__75742">
       <div class="focusTarget__54e4b" aria-label="Ver foto de perfil" role="button" tabindex="0"></div>
@@ -91,35 +92,34 @@
     </div>
   </div>
 
-  <!-- Firebase App y Realtime Database (SDK v9 Modular via CDN) -->
+  <!-- Audio elemento para reproduccion instantanea -->
+  <audio id="audio-ander" src="ANDER.mp3" preload="auto"></audio>
+
+  <!-- Firebase App y Realtime Database -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Reemplaza con los datos de tu consola de Firebase
+    // Configuración conectada a tu Realtime Database
     const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_PROYECTO.firebaseapp.com",
       databaseURL: "https://clav-2da48-default-rtdb.firebaseio.com/",
-      projectId: "TU_PROYECTO",
-      storageBucket: "TU_PROYECTO.appspot.com",
-      messagingSenderId: "TU_SENDER_ID",
-      appId: "TU_APP_ID"
+      projectId: "clav-2da48"
     };
 
-    // Inicializar Firebase
+    // Inicialización
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
     const counterRef = ref(database, 'likesCount');
 
     const counterElement = document.getElementById('counter');
     const buttonElement = document.getElementById('increment-btn');
+    const anderAudio = document.getElementById('audio-ander');
 
-    // Escuchar cambios en tiempo real
+    // Escuchar el contador en tiempo real desde Firebase
     onValue(counterRef, (snapshot) => {
       const data = snapshot.val();
       if (data === null) {
-        // Si no existe el campo en la base de datos, lo establece en 41
+        // Inicializar en 41 en la base de datos si está vacía
         runTransaction(counterRef, () => 41);
       } else {
         counterElement.textContent = data;
@@ -127,8 +127,13 @@
       }
     });
 
-    // Incrementar de forma atómica usando transacciones (evita colisiones si varios hacen clic a la vez)
+    // Acción al presionar el botón
     buttonElement.addEventListener('click', () => {
+      // Reproducir sonido (reinicia el audio si se presiona rápidamente varias veces)
+      anderAudio.currentTime = 0;
+      anderAudio.play().catch(error => console.log("Error al reproducir audio:", error));
+
+      // Sumar 1 al contador en Firebase
       runTransaction(counterRef, (currentValue) => {
         return (currentValue || 41) + 1;
       });
