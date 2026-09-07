@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cuantas veses le gusta a javi v2 ander</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: #2f3136;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .counter-container {
+      background-color: #36393f;
+      padding: 20px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .counter-number {
+      font-size: 48px;
+      font-weight: bold;
+      color: #5865f2;
+      margin-bottom: 15px;
+    }
+
+    button {
+      background-color: #5865f2;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #4752c4;
+    }
+
+    button:disabled {
+      background-color: #72767d;
+      cursor: not-allowed;
+    }
+
+    .avatar__44b0c {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>cuantas veses le gusta a javi v2 ander</h1>
+
+  <div class="counter-container">
+    <div id="counter" class="counter-number">Cargando...</div>
+    <button id="increment-btn" disabled>¡Me gusta!</button>
+  </div>
+
+  <div class="discord-profile">
+    <div class="avatar__75742 clickable__75742">
+      <div class="focusTarget__54e4b" aria-label="Ver foto de perfil" role="button" tabindex="0"></div>
+      <div class="wrapper__44b0c" role="img" aria-label="lll_pr1, Ausente" aria-hidden="false" style="width: 120px; height: 120px;">
+        <svg width="120" height="120" viewBox="0 0 120 120" class="mask__44b0c svg__44b0c" aria-hidden="true">
+          <foreignObject x="0" y="0" width="120" height="120">
+            <div class="avatarStack__44b0c overlay__75742">
+              <img alt="Perfil" class="avatar__44b0c" aria-hidden="true" src="https://cdn.discordapp.com/avatars/1452529215260852421/c0df2c596a4c919f93e887929a3cc194.webp?size=128">
+            </div>
+          </foreignObject>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase App y Realtime Database (SDK v9 Modular via CDN) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // Reemplaza con los datos de tu consola de Firebase
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROYECTO.firebaseapp.com",
+      databaseURL: "https://TU_PROYECTO-default-rtdb.firebaseio.com",
+      projectId: "TU_PROYECTO",
+      storageBucket: "TU_PROYECTO.appspot.com",
+      messagingSenderId: "TU_SENDER_ID",
+      appId: "TU_APP_ID"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const counterRef = ref(database, 'likesCount');
+
+    const counterElement = document.getElementById('counter');
+    const buttonElement = document.getElementById('increment-btn');
+
+    // Escuchar cambios en tiempo real
+    onValue(counterRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data === null) {
+        // Si no existe el campo en la base de datos, lo establece en 41
+        runTransaction(counterRef, () => 41);
+      } else {
+        counterElement.textContent = data;
+        buttonElement.disabled = false;
+      }
+    });
+
+    // Incrementar de forma atómica usando transacciones (evita colisiones si varios hacen clic a la vez)
+    buttonElement.addEventListener('click', () => {
+      runTransaction(counterRef, (currentValue) => {
+        return (currentValue || 41) + 1;
+      });
+    });
+  </script>
+
+</body>
+</html>
